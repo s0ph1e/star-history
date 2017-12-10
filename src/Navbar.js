@@ -31,7 +31,9 @@ export default class AppNavbar extends React.Component {
 					<Collapse isOpen={this.state.isOpen} navbar>
 						<Nav className="ml-auto" navbar>
 							<NavItem>
-								<NavLink href="/" className="text-right">Sign in with Github</NavLink>
+								<Button size="sm" href="/auth/github" className="btn-github">
+									Sign in with Github
+								</Button>
 							</NavItem>
 						</Nav>
 					</Collapse>
