@@ -2,15 +2,23 @@
   "name": "github-stars-graph",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:3001/",
+  "proxy": {
+    "/auth/github": {
+      "target": "http://localhost:3001/"
+    },
+    "/auth/github/callback": {
+      "target": "http://localhost:3001/"
+    }
+  },
   "dependencies": {
     "bootstrap": "^4.0.0-beta.2",
     "express": "^4.16.2",
     "github": "^13.0.1",
     "moment": "^2.19.3",
+    "passport": "^0.4.0",
+    "passport-github2": "^0.1.11",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "react-highcharts": "^15.0.0",
     "react-scripts": "1.0.17",
     "reactstrap": "^5.0.0-alpha.4",
     "recharts": "^1.0.0-beta.6"
