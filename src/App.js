@@ -102,12 +102,27 @@ function getStarHistory(repository) {
 		return history;
 	}
 
+	const accessToken = getCookie('gh_access_token');
+	if (accessToken) {
+		github.authenticate({
+			type: 'oauth',
+			token: accessToken
+		})
+	}
+
 	return github.activity.getStargazersForRepo({
 		headers: starHeaders,
 		per_page: 100,
 		owner,
 		repo
 	}).then(handleResults);
+}
+
+function getCookie(name) {
+	const parts = document.cookie.split(name + '=');
+	if (parts.length === 2) {
+		return parts.pop().split(';').shift();
+	}
 }
 
 function aggregateByMonth(history) {
