@@ -20,7 +20,6 @@ class App extends Component {
 	}
 
 	handleRepoChange(event) {
-		console.log(event);
 		this.setState({repo: event.target.value});
 	}
 
