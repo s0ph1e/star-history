@@ -1,33 +1,30 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import './App.css';
+import './style.css';
 import GithubApi from 'github';
-import {Input, Button, InputGroup} from 'reactstrap'
-import Navbar from './Navbar';
+import Searchbar from '../Searchbar';
+import StarHistoryGraph from '../StarHistoryGraph';
+import Navbar from '../Navbar';
 import moment from 'moment';
-
-import {ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line, Legend} from 'recharts';
 
 class App extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			repo: ''
+			starHistoryData: null,
+			starHistoryLoading: false
 		};
-
-		this.handleRepoChange = this.handleRepoChange.bind(this);
 		this.showRepoStarHistory = this.showRepoStarHistory.bind(this);
 	}
 
-	handleRepoChange(event) {
-		this.setState({repo: event.target.value});
-	}
-
-	showRepoStarHistory() {
-		getStarHistory(this.state.repo)
+	showRepoStarHistory(repo) {
+		this.setState({starHistoryLoading: true});
+		getStarHistory(repo)
 			.then(aggregateByMonth)
-			.then(drawGraph)
+			.then((starHistoryData) => {
+				this.setState({starHistoryData, starHistoryLoading: false});
+			})
 			.catch((e) => {
+				this.setState({starHistoryLoading: false});
 				console.log(e);
 				alert('Something went wrong!')
 			});
@@ -39,40 +36,19 @@ class App extends Component {
 				<Navbar/>
 				<div className="App-container">
 					<div className="container">
-						<div className="searchbar mt-3">
-						<InputGroup>
-							<Input className="mr-2" value={this.state.repo} onChange={this.handleRepoChange} />
-							<Button color="primary" onClick={this.showRepoStarHistory}>Go!</Button>
-						</InputGroup>
-						</div>
-						<div id="historyGraph"></div>
+						<Searchbar onSearch={this.showRepoStarHistory} />
+						<StarHistoryGraph data={this.state.starHistoryData} />
 					</div>
 				</div>
+				{this.state.starHistoryLoading && (<div className="overlay">
+					<div>Star history is loading</div>
+				</div>)}
 			</div>
 		);
 	}
 }
 
 export default App;
-
-function drawGraph(data) {
-	ReactDOM.render(
-		<ResponsiveContainer height={500} width="100%">
-			<LineChart data={data} margin={{top: 50}}>
-				<XAxis dataKey="month" padding={{left: 30, right: 30}} />
-				<YAxis />
-				<Tooltip />
-				<Legend verticalAlign="bottom" height={36}/>
-				<Line type='monotone' name="amount of stars" dataKey='amount' stroke='#8884d8'
-					  strokeWidth={2}
-					  dot={false}
-					  legendType='star'
-				/>
-			</LineChart>
-		</ResponsiveContainer>,
-		document.getElementById('historyGraph')
-	);
-}
 
 const github = new GithubApi({
 	rejectUnauthorized: false

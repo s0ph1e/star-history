@@ -1,0 +1,6 @@
+.empty-graph {
+    height: 500px;
+    width: 100%;
+    background: url('./placeholder.png') no-repeat left center;
+    background-size: contain;
+}

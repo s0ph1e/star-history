@@ -1,0 +1,29 @@
+.App-header {
+    margin-bottom: 50px;
+    background: linear-gradient(to bottom right, #fefefe 0%, #ededed 100%);
+    border-bottom: 1px solid #ced4da;
+}
+
+.App-header__container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.App-header__container .brand {
+    color: #555;
+}
+
+.App-header__container .btn-github {
+    background-image: url('./github-logo.png');
+    background-position: 10px center;
+    background-repeat: no-repeat;
+    color: #fff;
+    background-color: #444;
+    border-color: rgba(0,0,0,0.2);
+    position: relative;
+    padding-left: 38px;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
