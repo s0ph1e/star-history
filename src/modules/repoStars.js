@@ -1,10 +1,5 @@
-import GithubApi from 'github';
 import moment from 'moment';
-
-const github = new GithubApi({
-	rejectUnauthorized: false
-});
-const starHeaders = { "Accept": "application/vnd.github.v3.star+json"};
+import axios from 'axios';
 
 export const STAR_HISTORY_REQUESTED = 'repo/STAR_HISTORY_REQUESTED';
 export const STAR_HISTORY_RECEIVED = 'repo/STAR_HISTORY_RECEIVED';
@@ -54,9 +49,10 @@ export const getStarHistory = () => {
 			type: STAR_HISTORY_REQUESTED
 		});
 
-		const repo = getState().repoStars.repo;
+		const repository = getState().repoStars.repo;
+		const accessToken = getState().user.accessToken;
 
-		return fetchStarHistory(repo)
+		return fetchStarHistory({repository, accessToken})
 			.then(aggregateByMonth)
 			.then((starHistoryData) =>
 				dispatch({
@@ -68,6 +64,7 @@ export const getStarHistory = () => {
 				dispatch({
 					type: STAR_HISTORY_ERROR
 				});
+				console.log(e);
 				alert('Something went wrong!') // TODO: remove this
 			});
 	}
@@ -82,7 +79,7 @@ export const changeRepo = ({repo}) => {
 	}
 };
 
-function fetchStarHistory(repository) {
+function fetchStarHistory({repository, accessToken = null}) {
 	const parts = repository.split('/');
 	const owner = parts[0];
 	const repo = parts[1];
@@ -91,40 +88,37 @@ function fetchStarHistory(repository) {
 		return Promise.reject(new Error('Wrong repo name'));
 	}
 
+	const starHeaders = { "Accept": "application/vnd.github.v3.star+json"};
 	let history = [];
 
 	function handleResults(result) {
 		history = history.concat(result.data);
 
-		if (github.hasNextPage(result)) {
-			return github.getNextPage(result, starHeaders)
-				.then(handleResults)
+		const hasLinks = result.headers && result.headers.link;
+		if (hasLinks) {
+			const nextRegex = /<([^>]*)>;\s*rel="next"/;
+			const matches = result.headers.link.match(nextRegex);
+			const nextPage = matches && matches[1];
+			if (nextPage) {
+				return axios({
+					url: nextPage,
+					headers: starHeaders
+				}).then(handleResults);
+			}
 		}
 
 		return history;
 	}
 
-	const accessToken = getCookie('gh_access_token');
+	let url = `https://api.github.com/repos/${owner}/${repo}/stargazers?per_page=100`;
 	if (accessToken) {
-		github.authenticate({
-			type: 'oauth',
-			token: accessToken
-		})
+		url = url + '&access_token=' + accessToken
 	}
 
-	return github.activity.getStargazersForRepo({
-		headers: starHeaders,
-		per_page: 100,
-		owner,
-		repo
+	return axios({
+		url,
+		headers: starHeaders
 	}).then(handleResults);
-}
-
-function getCookie(name) {
-	const parts = document.cookie.split(name + '=');
-	if (parts.length === 2) {
-		return parts.pop().split(';').shift();
-	}
 }
 
 function aggregateByMonth(history) {

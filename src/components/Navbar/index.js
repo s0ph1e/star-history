@@ -1,8 +1,9 @@
 import React from 'react';
 import './style.css';
 import {Collapse, Navbar, NavbarBrand, Nav, NavItem, Button} from 'reactstrap';
+import { connect } from 'react-redux'
 
-export default class AppNavbar extends React.Component {
+class AppNavbar extends React.Component {
 	render() {
 		return (
 			<div className="App-header">
@@ -15,6 +16,7 @@ export default class AppNavbar extends React.Component {
 									<Button size="sm" href="/auth/github" className="btn-github">
 										Sign in with Github
 									</Button>
+									{/*<span>Hi {this.props.username}</span>*/}
 								</NavItem>
 							</Nav>
 						</Collapse>
@@ -24,3 +26,12 @@ export default class AppNavbar extends React.Component {
 		);
 	}
 }
+
+const mapStateToProps = state => ({
+	username: state.user.username
+});
+
+export default connect(
+	mapStateToProps,
+	null
+)(AppNavbar)
