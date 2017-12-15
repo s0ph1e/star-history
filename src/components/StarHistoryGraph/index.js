@@ -5,7 +5,7 @@ import './style.css'
 class StarHistoryGraph extends Component {
 	render() {
 		const {data} = this.props;
-		const hasData = !!data;
+		const hasData = !!data.length;
 
 		if (!hasData) {
 			return <div className="empty-graph"></div>

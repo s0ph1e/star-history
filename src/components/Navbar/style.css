@@ -9,7 +9,7 @@
     margin: 0 auto;
 }
 
-.App-header__container .brand {
+.App-header__container .navbar-brand.brand {
     color: #555;
 }
 

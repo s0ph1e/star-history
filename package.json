@@ -11,17 +11,24 @@
     }
   },
   "dependencies": {
+    "axios": "^0.17.1",
     "bootstrap": "^4.0.0-beta.2",
     "express": "^4.16.2",
     "github": "^13.0.1",
+    "history": "^4.7.2",
     "moment": "^2.19.3",
     "passport": "^0.4.0",
     "passport-github2": "^0.1.11",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "react-redux": "^5.0.6",
+    "react-router-dom": "^4.2.2",
+    "react-router-redux": "^5.0.0-alpha.9",
     "react-scripts": "1.0.17",
     "reactstrap": "^5.0.0-alpha.4",
-    "recharts": "^1.0.0-beta.6"
+    "recharts": "^1.0.0-beta.6",
+    "redux": "^3.7.2",
+    "redux-thunk": "^2.2.0"
   },
   "scripts": {
     "start": "react-scripts start",
