@@ -2,17 +2,3 @@
   max-width: 900px;
   margin: 0 auto;
 }
-
-.overlay {
-  position: absolute;
-  z-index: 10;
-  height: 100%;
-  width: 100%;
-  top: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: white;
-  opacity: 0.7;
-}

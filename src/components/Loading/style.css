@@ -1,0 +1,26 @@
+.overlay {
+    position: absolute;
+    z-index: 10;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    opacity: 0.7;
+}
+
+.overlay__spinner {
+    width: 250px;
+    height: 50px;
+    background: url('star-animated.svg') repeat-x;
+    background-size: 50px;
+    text-align: center;
+}
+
+.overlay__message {
+    color: #555;
+}

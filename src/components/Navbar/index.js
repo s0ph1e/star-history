@@ -8,7 +8,7 @@ export default class AppNavbar extends React.Component {
 			<div className="App-header">
 				<div className="App-header__container">
 					<Navbar color="faded" light expand={true} className="flex-column flex-sm-row">
-						<NavbarBrand href="/" className="m-0 brand">&#x02605; Github Star History</NavbarBrand>
+						<NavbarBrand href="/" className="m-0 brand">Github Star History</NavbarBrand>
 						<Collapse navbar>
 							<Nav className="ml-auto" navbar>
 								<NavItem>

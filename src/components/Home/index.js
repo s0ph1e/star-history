@@ -6,6 +6,7 @@ import { getStarHistory } from '../../modules/repoStars';
 
 import Searchbar from '../Searchbar';
 import StarHistoryGraph from '../StarHistoryGraph';
+import Loading from '../Loading';
 
 class Home extends Component {
 	render() {
@@ -13,14 +14,11 @@ class Home extends Component {
 			<div>
 				<Searchbar onSearch={this.props.getStarHistory} />
 				<StarHistoryGraph data={this.props.starHistoryData} />
-				{this.props.starHistoryLoading && (<div className="overlay">
-					<div>Star history is loading</div>
-				</div>)}
+				{this.props.starHistoryLoading && <Loading message="Star history is loading" />}
 			</div>
 		);
 	}
 }
-
 
 const mapStateToProps = state => ({
 	starHistoryData: state.repoStars.data,

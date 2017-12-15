@@ -10,6 +10,9 @@
 }
 
 .App-header__container .navbar-brand.brand {
+    background: url('./star-static.svg') no-repeat;
+    background-position-y: center;
+    padding-left: 40px;
     color: #555;
 }
 
