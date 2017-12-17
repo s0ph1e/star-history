@@ -123,16 +123,16 @@ function fetchStarHistory({repository, accessToken = null}) {
 
 function aggregateByMonth(history) {
 	const dates = history.map((event) => moment(event.starred_at));
-	const firstDate = moment.min(dates);
-	const lastDate = moment.max(dates);
-	const amountOfMonth = lastDate.diff(firstDate, 'months') + 2;
+	const firstDate = moment.min(dates).startOf('month');
+	const lastDate = moment.max(dates).startOf('month');
+	const amountOfMonth = lastDate.diff(firstDate, 'months');
 
-	console.log('firstDate', firstDate);
-	console.log('lastDate', lastDate);
+	console.log('firstDate', firstDate.format('YYYY-MM-DD'));
+	console.log('lastDate', lastDate.format('YYYY-MM-DD'));
 	console.log('amountOfMonth', amountOfMonth);
 
 	const amountsMap = {};
-	for (let i = 0; i < amountOfMonth; i++) {
+	for (let i = 0; i <= amountOfMonth; i++) {
 		const currentMonth = firstDate.clone().add(i, 'months').format('YYYY-MM');
 		amountsMap[currentMonth] = 0;
 	}

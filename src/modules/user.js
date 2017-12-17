@@ -1,9 +1,10 @@
 const cookieName = 'gh_data';
-const githubData = getCookie(cookieName);
+const defaultGithubData = {username: null, accessToken: null};
+const githubData = getCookie(cookieName) || defaultGithubData;
 
 const initialState = {
-	username: githubData.username || null,
-	accessToken: githubData.accessToken || null
+	username: githubData.username,
+	accessToken: githubData.accessToken
 };
 
 export default (state = initialState, action) => {

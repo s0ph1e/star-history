@@ -13,10 +13,10 @@ class AppNavbar extends React.Component {
 						<Collapse navbar>
 							<Nav className="ml-auto" navbar>
 								<NavItem>
-									<Button size="sm" href="/auth/github" className="btn-github">
+									{!this.props.username && <Button size="sm" href="/auth/github" className="btn-github">
 										Sign in with Github
-									</Button>
-									{/*<span>Hi {this.props.username}</span>*/}
+									</Button>}
+									{this.props.username && <span>Hi {this.props.username}</span>}
 								</NavItem>
 							</Nav>
 						</Collapse>

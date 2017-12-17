@@ -13,7 +13,7 @@ class StarHistoryGraph extends Component {
 		return (
 			<ResponsiveContainer height={500} width="100%">
 				<LineChart data={data} margin={{top: 50}}>
-					<XAxis dataKey="month" padding={{left: 30, right: 30}} />
+					<XAxis dataKey="month" padding={{left: 10, right: 10}} />
 					<YAxis />
 					<Tooltip />
 					<Legend verticalAlign="bottom" height={36}/>

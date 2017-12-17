@@ -1,18 +1,20 @@
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const http = require('http');
 const path = require('path');
 const passport = require('passport');
 const GitHubStrategy = require('passport-github2').Strategy;
+const GithubApi = require('github');
 
 const cookieName = 'gh_data';
+
+const clientID = process.env.GITHUB_APP_ID;
+const clientSecret = process.env.GITHUB_APP_SECRET;
 
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
 
-passport.use(new GitHubStrategy({
-		clientID: process.env.GITHUB_APP_ID,
-		clientSecret: process.env.GITHUB_APP_SECRET
-	},
+passport.use(new GitHubStrategy({clientID, clientSecret},
 	(accessToken, refreshToken, profile, done) => {
 		process.nextTick(() => done(null, {accessToken, profile}));
 	}
@@ -21,8 +23,8 @@ passport.use(new GitHubStrategy({
 const app = express();
 
 app.set('port', process.env.PORT || 3001);
+app.use(cookieParser());
 app.use(passport.initialize());
-app.use(express.static('build'));
 
 app.get('/auth/github', passport.authenticate('github', {}));
 
@@ -38,10 +40,49 @@ app.get('/auth/github/callback',
 	}
 );
 
-app.get('/', (req, res) => {
-	res.sendFile(path.join(__dirname + '/build/index.html'));
-});
+app.get('/',
+	checkAccessToken,
+	(req, res) => res.sendFile(path.join(__dirname + '/build/index.html'))
+);
+
+app.use(express.static('build'));
 
 http.createServer(app).listen(app.get('port'), function(){
 	console.log('Express server listening on port ' + app.get('port'));
 });
+
+function checkAccessToken (req, res, next) {
+	const accessToken = getAccessToken(req.cookies[cookieName]);
+
+	if (accessToken) {
+		const github = new GithubApi({});
+		github.authenticate({
+			type: 'basic',
+			username: clientID,
+			password: clientSecret
+		});
+		github.authorization.check({
+			client_id: clientID,
+			access_token: accessToken
+		}).then(() => next()).catch(() => {
+			res.clearCookie(cookieName);
+			next();
+		});
+	} else {
+		res.clearCookie(cookieName);
+		next();
+	}
+}
+
+function getAccessToken(cookie) {
+	if (!cookie) {
+		return null;
+	}
+
+	try {
+		const githubData = JSON.parse(cookie);
+        return githubData ? githubData.accessToken : null;
+	} catch (e) {
+		return null;
+	}
+}
