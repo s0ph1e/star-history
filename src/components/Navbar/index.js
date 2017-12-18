@@ -1,6 +1,6 @@
 import React from 'react';
 import './style.css';
-import {Collapse, Navbar, NavbarBrand, Nav, NavItem, Button} from 'reactstrap';
+import {Collapse, Navbar, NavbarBrand, Nav, NavItem, Button, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem} from 'reactstrap';
 import { connect } from 'react-redux'
 
 class AppNavbar extends React.Component {
@@ -13,10 +13,8 @@ class AppNavbar extends React.Component {
 						<Collapse navbar>
 							<Nav className="ml-auto" navbar>
 								<NavItem>
-									{!this.props.username && <Button size="sm" href="/auth/github" className="btn-github">
-										Sign in with Github
-									</Button>}
-									{this.props.username && <span>Hi {this.props.username}</span>}
+									{!this.props.username && this.renderLoginButton()}
+									{this.props.username && this.renderProfileMenu()}
 								</NavItem>
 							</Nav>
 						</Collapse>
@@ -24,6 +22,25 @@ class AppNavbar extends React.Component {
 				</div>
 			</div>
 		);
+	}
+
+	renderLoginButton() {
+		return <Button size="sm" href="/auth/github" className="btn-github">Sign in with Github</Button>;
+	}
+
+	renderProfileMenu() {
+		return (
+			<UncontrolledDropdown nav inNavbar>
+				<DropdownToggle nav caret>
+					Hi {this.props.username}
+				</DropdownToggle>
+				<DropdownMenu>
+					<DropdownItem href="/logout">
+						logout
+					</DropdownItem>
+				</DropdownMenu>
+			</UncontrolledDropdown>
+		)
 	}
 }
 

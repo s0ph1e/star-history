@@ -7,6 +7,7 @@ const GitHubStrategy = require('passport-github2').Strategy;
 const GithubApi = require('github');
 
 const cookieName = 'gh_data';
+const oneYear = 1000 * 60 * 60 * 24 * 365;
 
 const clientID = process.env.GITHUB_APP_ID;
 const clientSecret = process.env.GITHUB_APP_SECRET;
@@ -35,10 +36,15 @@ app.get('/auth/github/callback',
 			accessToken: req.user.accessToken,
 			username: req.user.profile._json.login
 		};
-		res.cookie(cookieName, JSON.stringify(githubData));
+		res.cookie(cookieName, JSON.stringify(githubData), { expires: new Date(Date.now() + oneYear) });
 		res.redirect('/');
 	}
 );
+
+app.get('/logout', (req, res) => {
+    res.clearCookie(cookieName);
+    res.redirect('/');
+});
 
 app.get('/',
 	checkAccessToken,
