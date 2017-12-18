@@ -30,7 +30,7 @@ class AppNavbar extends React.Component {
 
 	renderProfileMenu() {
 		return (
-			<UncontrolledDropdown nav inNavbar>
+			<UncontrolledDropdown>
 				<DropdownToggle nav caret>
 					Hi {this.props.username}
 				</DropdownToggle>

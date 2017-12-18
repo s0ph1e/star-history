@@ -5,11 +5,13 @@ export const STAR_HISTORY_REQUESTED = 'repo/STAR_HISTORY_REQUESTED';
 export const STAR_HISTORY_RECEIVED = 'repo/STAR_HISTORY_RECEIVED';
 export const STAR_HISTORY_ERROR = 'repo/STAR_HISTORY_ERROR';
 export const REPO_CHANGED = 'repo/REPO_CHANGED';
+export const STAR_HISTORY_LOADING = 'repo/STAR_HISTORY_LOADING';
 
 const initialState = {
 	repo: '',
 	data: [],
-	isLoading: false
+	isLoading: false,
+	loadingProgress: 0 // percents
 };
 
 export default (state = initialState, action) => {
@@ -37,6 +39,12 @@ export default (state = initialState, action) => {
 				...state,
 				repo: action.repo
 			};
+		case STAR_HISTORY_LOADING:
+			console.log(action.loadingProgress);
+			return {
+				...state,
+				loadingProgress: action.loadingProgress
+			};
 
 		default:
 			return state
@@ -51,15 +59,27 @@ export const getStarHistory = () => {
 
 		const repository = getState().repoStars.repo;
 		const accessToken = getState().user.accessToken;
+		let totalStarsCount, loadedStarsCount = 0;
 
-		return fetchStarHistory({repository, accessToken})
-			.then(aggregateByMonth)
-			.then((starHistoryData) =>
-				dispatch({
-					type: STAR_HISTORY_RECEIVED,
-					data: starHistoryData
-				})
-			)
+		function onChunkLoaded(size) {
+			loadedStarsCount = loadedStarsCount + size;
+			dispatch({
+				type: STAR_HISTORY_LOADING,
+				loadingProgress: Math.round((loadedStarsCount / totalStarsCount) * 100)
+			});
+		}
+
+		function onHistoryLoaded(data) {
+			dispatch({
+				type: STAR_HISTORY_RECEIVED,
+				data
+			})
+		}
+
+		return fetchStarCount({repository, accessToken})
+			.then((starsCount) => totalStarsCount = starsCount)
+			.then(() => fetchStarHistory({repository, accessToken, onChunkLoaded}))
+			.then(onHistoryLoaded)
 			.catch((e) => {
 				dispatch({
 					type: STAR_HISTORY_ERROR
@@ -79,7 +99,20 @@ export const changeRepo = ({repo}) => {
 	}
 };
 
-function fetchStarHistory({repository, accessToken = null}) {
+function fetchStarCount({repository, accessToken = null}) {
+    const parts = repository.split('/');
+    const owner = parts[0];
+    const repo = parts[1];
+
+    if (!owner || !repo) {
+        return Promise.reject(new Error('Wrong repo name'));
+    }
+
+    const github = initializeGithub({accessToken});
+    return github.get(`/repos/${owner}/${repo}`).then((response) => response.data['stargazers_count']);
+}
+
+function fetchStarHistory({repository, accessToken = null, onChunkLoaded}) {
 	const parts = repository.split('/');
 	const owner = parts[0];
 	const repo = parts[1];
@@ -88,10 +121,13 @@ function fetchStarHistory({repository, accessToken = null}) {
 		return Promise.reject(new Error('Wrong repo name'));
 	}
 
-	const starHeaders = { "Accept": "application/vnd.github.v3.star+json"};
+	const starHeaders = { 'Accept': 'application/vnd.github.v3.star+json' };
+	const github = initializeGithub({accessToken});
+
 	let history = [];
 
 	function handleResults(result) {
+		onChunkLoaded && onChunkLoaded(result.data.length);
 		history = history.concat(result.data);
 
 		const hasLinks = result.headers && result.headers.link;
@@ -100,25 +136,16 @@ function fetchStarHistory({repository, accessToken = null}) {
 			const matches = result.headers.link.match(nextRegex);
 			const nextPage = matches && matches[1];
 			if (nextPage) {
-				return axios({
-					url: nextPage,
-					headers: starHeaders
-				}).then(handleResults);
+				return github.get(nextPage, { headers: starHeaders }).then(handleResults);
 			}
 		}
-
 		return history;
 	}
 
-	let url = `https://api.github.com/repos/${owner}/${repo}/stargazers?per_page=100`;
-	if (accessToken) {
-		url = url + '&access_token=' + accessToken
-	}
-
-	return axios({
-		url,
-		headers: starHeaders
-	}).then(handleResults);
+	return github.get(`/repos/${owner}/${repo}/stargazers`, {
+		headers: starHeaders,
+		params: { per_page: 100 }
+	}).then(handleResults).then(aggregateByMonth);
 }
 
 function aggregateByMonth(history) {
@@ -126,10 +153,6 @@ function aggregateByMonth(history) {
 	const firstDate = moment.min(dates).startOf('month');
 	const lastDate = moment.max(dates).startOf('month');
 	const amountOfMonth = lastDate.diff(firstDate, 'months');
-
-	console.log('firstDate', firstDate.format('YYYY-MM-DD'));
-	console.log('lastDate', lastDate.format('YYYY-MM-DD'));
-	console.log('amountOfMonth', amountOfMonth);
 
 	const amountsMap = {};
 	for (let i = 0; i <= amountOfMonth; i++) {
@@ -146,5 +169,17 @@ function aggregateByMonth(history) {
 	return Object.keys(amountsMap).map((month) => {
 		tmpAmount += amountsMap[month];
 		return {month, increment: amountsMap[month], amount: tmpAmount}
+	});
+}
+
+function initializeGithub ({accessToken}) {
+	const params = {};
+	if (accessToken) {
+		params['access_token'] = accessToken
+	}
+
+	return axios.create({
+		baseURL: 'https://api.github.com',
+		params
 	});
 }
