@@ -10,11 +10,12 @@ import Loading from '../Loading';
 
 class Home extends Component {
 	render() {
+		const message = `Star history is loading: ${this.props.starHistoryLoadingProgress}%`;
 		return (
 			<div>
 				<Searchbar onSearch={this.props.getStarHistory} />
 				<StarHistoryGraph data={this.props.starHistoryData} />
-				{this.props.starHistoryLoading && <Loading message="Star history is loading" />}
+				{this.props.starHistoryIsLoading && <Loading message={message}/>}
 			</div>
 		);
 	}
@@ -22,7 +23,8 @@ class Home extends Component {
 
 const mapStateToProps = state => ({
 	starHistoryData: state.repoStars.data,
-	starHistoryLoading: state.repoStars.isLoading
+	starHistoryIsLoading: state.repoStars.isLoading,
+	starHistoryLoadingProgress: state.repoStars.loadingProgress
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({

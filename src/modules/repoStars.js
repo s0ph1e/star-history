@@ -19,7 +19,8 @@ export default (state = initialState, action) => {
 		case STAR_HISTORY_REQUESTED:
 			return {
 				...state,
-				isLoading: true
+				isLoading: true,
+				loadingProgress: 0
 			};
 		case STAR_HISTORY_RECEIVED:
 			return {
@@ -27,20 +28,18 @@ export default (state = initialState, action) => {
 				data: action.data,
 				isLoading: false
 			};
-		case STAR_HISTORY_ERROR: {
+		case STAR_HISTORY_ERROR:
 			return {
 				...state,
 				data: [],
 				isLoading: false
-			}
-		}
+			};
 		case REPO_CHANGED:
 			return {
 				...state,
 				repo: action.repo
 			};
 		case STAR_HISTORY_LOADING:
-			console.log(action.loadingProgress);
 			return {
 				...state,
 				loadingProgress: action.loadingProgress
@@ -100,16 +99,16 @@ export const changeRepo = ({repo}) => {
 };
 
 function fetchStarCount({repository, accessToken = null}) {
-    const parts = repository.split('/');
-    const owner = parts[0];
-    const repo = parts[1];
+	const parts = repository.split('/');
+	const owner = parts[0];
+	const repo = parts[1];
 
-    if (!owner || !repo) {
-        return Promise.reject(new Error('Wrong repo name'));
-    }
+	if (!owner || !repo) {
+		return Promise.reject(new Error('Wrong repo name'));
+	}
 
-    const github = initializeGithub({accessToken});
-    return github.get(`/repos/${owner}/${repo}`).then((response) => response.data['stargazers_count']);
+	const github = initializeGithub({accessToken});
+	return github.get(`/repos/${owner}/${repo}`).then((response) => response.data['stargazers_count']);
 }
 
 function fetchStarHistory({repository, accessToken = null, onChunkLoaded}) {
