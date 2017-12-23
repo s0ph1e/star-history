@@ -1,5 +1,4 @@
 import moment from 'moment';
-import axios from 'axios';
 
 export const STAR_HISTORY_REQUESTED = 'repo/STAR_HISTORY_REQUESTED';
 export const STAR_HISTORY_RECEIVED = 'repo/STAR_HISTORY_RECEIVED';
@@ -57,9 +56,9 @@ export const getStarHistory = () => {
 		});
 
 		const repository = getState().repoStars.repo;
-		const accessToken = getState().user.accessToken;
 		let totalStarsCount, loadedStarsCount = 0;
 
+		// TODO: handle as separate action, see interceptor
 		function onChunkLoaded(size) {
 			loadedStarsCount = loadedStarsCount + size;
 			dispatch({
@@ -75,9 +74,9 @@ export const getStarHistory = () => {
 			})
 		}
 
-		return fetchStarCount({repository, accessToken})
-			.then((starsCount) => totalStarsCount = starsCount)
-			.then(() => fetchStarHistory({repository, accessToken, onChunkLoaded}))
+		return dispatch(fetchRepoInfo({repository}))
+			.then(response => {totalStarsCount = response.payload.data['stargazers_count']})
+			.then(() => dispatch(fetchStarHistory({repository, onChunkLoaded})))
 			.then(onHistoryLoaded)
 			.catch((e) => {
 				dispatch({
@@ -98,54 +97,29 @@ export const changeRepo = ({repo}) => {
 	}
 };
 
-function fetchStarCount({repository, accessToken = null}) {
-	const parts = repository.split('/');
-	const owner = parts[0];
-	const repo = parts[1];
-
-	if (!owner || !repo) {
-		return Promise.reject(new Error('Wrong repo name'));
-	}
-
-	const github = initializeGithub({accessToken});
-	return github.get(`/repos/${owner}/${repo}`).then((response) => response.data['stargazers_count']);
-}
-
-function fetchStarHistory({repository, accessToken = null, onChunkLoaded}) {
-	const parts = repository.split('/');
-	const owner = parts[0];
-	const repo = parts[1];
-
-	if (!owner || !repo) {
-		return Promise.reject(new Error('Wrong repo name'));
-	}
-
-	const starHeaders = { 'Accept': 'application/vnd.github.v3.star+json' };
-	const github = initializeGithub({accessToken});
-
-	let history = [];
-
-	function handleResults(result) {
-		onChunkLoaded && onChunkLoaded(result.data.length);
-		history = history.concat(result.data);
-
-		const hasLinks = result.headers && result.headers.link;
-		if (hasLinks) {
-			const nextRegex = /<([^>]*)>;\s*rel="next"/;
-			const matches = result.headers.link.match(nextRegex);
-			const nextPage = matches && matches[1];
-			if (nextPage) {
-				return github.get(nextPage, { headers: starHeaders }).then(handleResults);
+const fetchRepoInfo = ({repository}) => {
+	return dispatch => dispatch({
+		type: 'GET_REPO_INFO',
+		payload: {
+			request: {
+				url: `/repos/${repository}`
 			}
 		}
-		return history;
-	}
+	});
+};
 
-	return github.get(`/repos/${owner}/${repo}/stargazers`, {
-		headers: starHeaders,
-		params: { per_page: 100 }
-	}).then(handleResults).then(aggregateByMonth);
-}
+const fetchStarHistory = ({repository}) => {
+	return dispatch => dispatch({
+		type: 'GET_STAR_HISTORY',
+		payload: {
+			request: {
+				url: `/repos/${repository}/stargazers`,
+				headers: { 'Accept': 'application/vnd.github.v3.star+json' },
+				params: { per_page: 100 }
+			}
+		}
+	}).then((res) => aggregateByMonth(res.payload.data));
+};
 
 function aggregateByMonth(history) {
 	const dates = history.map((event) => moment(event.starred_at));
@@ -168,17 +142,5 @@ function aggregateByMonth(history) {
 	return Object.keys(amountsMap).map((month) => {
 		tmpAmount += amountsMap[month];
 		return {month, increment: amountsMap[month], amount: tmpAmount}
-	});
-}
-
-function initializeGithub ({accessToken}) {
-	const params = {};
-	if (accessToken) {
-		params['access_token'] = accessToken
-	}
-
-	return axios.create({
-		baseURL: 'https://api.github.com',
-		params
 	});
 }
