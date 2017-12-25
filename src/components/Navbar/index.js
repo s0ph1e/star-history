@@ -60,10 +60,10 @@ class AppNavbar extends React.Component {
 
 	renderProfileMenu() {
 		if (!this.props.username) {
-			return <Button size="sm" href="/auth/github" className="btn-github">Sign in with Github</Button>;
+			return <Button size="sm" href="/auth/github" className="btn-github mt-2 mb-2 mt-sm-0 mb-sm-0">Sign in with Github</Button>;
 		}
 		return (
-			<UncontrolledDropdown>
+			<UncontrolledDropdown className="mt-2 mb-2 mt-sm-0 mb-sm-0">
 				<DropdownToggle caret color="outline-secondary" size="sm">
 					Hi {this.props.username}
 				</DropdownToggle>

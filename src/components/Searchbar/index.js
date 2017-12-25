@@ -40,9 +40,9 @@ class Searchbar extends Component {
 			<div className="searchbar">
 				<InputGroup>
 					<Input className="mr-2" placeholder={repoPlaceholder}
-							value={this.props.repo}
-							onChange={this.handleRepoChange}
-							onKeyDown={this.handleKeyDown}
+						value={this.props.repo}
+						onChange={this.handleRepoChange}
+						onKeyDown={this.handleKeyDown}
 					/>
 					<Button color="primary" onClick={this.doSearch}>Go!</Button>
 				</InputGroup>
