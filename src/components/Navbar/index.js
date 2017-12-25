@@ -1,22 +1,39 @@
 import React from 'react';
-import './style.css';
-import {Collapse, Navbar, NavbarBrand, Nav, NavItem, Button, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem} from 'reactstrap';
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
+
+import {
+	Collapse, Navbar, NavbarBrand, NavbarToggler, Nav, NavItem, NavLink,
+	Button, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem
+} from 'reactstrap';
+
+import './style.css';
 
 class AppNavbar extends React.Component {
+	constructor(props) {
+		super(props);
+
+		this.toggle = this.toggle.bind(this);
+		this.state = {
+			isOpen: false
+		};
+	}
+	toggle() {
+		this.setState({
+			isOpen: !this.state.isOpen
+		});
+	}
+
 	render() {
 		return (
 			<div className="App-header">
 				<div className="App-header__container">
-					<Navbar color="faded" light expand={true} className="flex-column flex-sm-row">
-						<NavbarBrand href="/" className="m-0 brand">Github Star History</NavbarBrand>
-						<Collapse navbar>
-							<Nav className="ml-auto" navbar>
-								<NavItem>
-									{!this.props.username && this.renderLoginButton()}
-									{this.props.username && this.renderProfileMenu()}
-								</NavItem>
-							</Nav>
+					<Navbar color="faded" light expand="sm">
+						<NavbarBrand href="/" className="brand">Github Star History</NavbarBrand>
+						<NavbarToggler onClick={this.toggle} />
+						<Collapse isOpen={this.state.isOpen} navbar>
+							{this.renderNav()}
+							{this.renderProfileMenu()}
 						</Collapse>
 					</Navbar>
 				</div>
@@ -24,14 +41,30 @@ class AppNavbar extends React.Component {
 		);
 	}
 
-	renderLoginButton() {
-		return <Button size="sm" href="/auth/github" className="btn-github">Sign in with Github</Button>;
+	renderNav() {
+		return (
+			<Nav className="mr-auto" navbar>
+				{this.props.username && (
+					<NavItem>
+						<NavLink tag={Link} to="/">Home</NavLink>
+					</NavItem>
+				)}
+				{this.props.username && (
+					<NavItem>
+						<NavLink tag={Link} to="/repos">Your repos</NavLink>
+					</NavItem>
+				)}
+			</Nav>
+		)
 	}
 
 	renderProfileMenu() {
+		if (!this.props.username) {
+			return <Button size="sm" href="/auth/github" className="btn-github">Sign in with Github</Button>;
+		}
 		return (
 			<UncontrolledDropdown>
-				<DropdownToggle nav caret>
+				<DropdownToggle caret color="outline-secondary" size="sm">
 					Hi {this.props.username}
 				</DropdownToggle>
 				<DropdownMenu>
