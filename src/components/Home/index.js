@@ -9,8 +9,10 @@ import StarHistoryGraph from '../StarHistoryGraph';
 import Loading from '../Loading';
 
 class Home extends Component {
+
 	render() {
-		const message = `Star history is loading: ${this.props.starHistoryLoadingProgress}%`;
+		const progress = Math.round((this.props.starHistoryStarsLoaded / this.props.starHistoryStarsTotal) * 100);
+		const message = `Star history is loading: ${progress}%`;
 		return (
 			<div>
 				<Searchbar onSearch={this.props.getStarHistory} />
@@ -24,7 +26,8 @@ class Home extends Component {
 const mapStateToProps = state => ({
 	starHistoryData: state.repoStars.data,
 	starHistoryIsLoading: state.repoStars.isLoading,
-	starHistoryLoadingProgress: state.repoStars.loadingProgress
+	starHistoryStarsTotal: state.repoStars.totalStarsCount,
+	starHistoryStarsLoaded: state.repoStars.loadedStarsCount
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({

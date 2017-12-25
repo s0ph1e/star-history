@@ -1,47 +1,62 @@
 import moment from 'moment';
 
-export const STAR_HISTORY_REQUESTED = 'repo/STAR_HISTORY_REQUESTED';
-export const STAR_HISTORY_RECEIVED = 'repo/STAR_HISTORY_RECEIVED';
-export const STAR_HISTORY_ERROR = 'repo/STAR_HISTORY_ERROR';
-export const REPO_CHANGED = 'repo/REPO_CHANGED';
-export const STAR_HISTORY_LOADING = 'repo/STAR_HISTORY_LOADING';
+export const GET_STAR_HISTORY = 'stars/GET_STAR_HISTORY';
+export const GET_STAR_HISTORY_SUCCESS = 'stars/GET_STAR_HISTORY_SUCCESS';
+export const GET_STAR_HISTORY_ERROR = 'stars/GET_STAR_HISTORY_ERROR';
+export const GET_STAR_HISTORY_CHUNK = 'stars/GET_STAR_HISTORY_CHUNK';
+
+export const CHANGE_REPO = 'stars/CHANGE_REPO';
+export const GET_REPO_INFO = 'stars/GET_REPO_INFO';
+export const GET_REPO_INFO_SUCCESS = 'stars/GET_REPO_INFO_SUCCESS';
 
 const initialState = {
 	repo: '',
 	data: [],
-	isLoading: false,
-	loadingProgress: 0 // percents
+	totalStarsCount: 0,
+	loadedStarsCount: 0,
+	isLoading: false
 };
 
 export default (state = initialState, action) => {
 	switch (action.type) {
-		case STAR_HISTORY_REQUESTED:
+		case GET_STAR_HISTORY:
 			return {
 				...state,
 				isLoading: true,
-				loadingProgress: 0
+				loadedStarsCount: 0
 			};
-		case STAR_HISTORY_RECEIVED:
+
+		case GET_STAR_HISTORY_CHUNK:
 			return {
 				...state,
-				data: action.data,
+				loadedStarsCount: state.loadedStarsCount + action.length
+			};
+
+		case GET_STAR_HISTORY_SUCCESS:
+			return {
+				...state,
+				data: aggregateByMonth(action.payload.data),
 				isLoading: false
 			};
-		case STAR_HISTORY_ERROR:
+
+		case GET_STAR_HISTORY_ERROR:
 			return {
 				...state,
 				data: [],
+				loadedStarsCount: 0,
 				isLoading: false
 			};
-		case REPO_CHANGED:
+
+		case CHANGE_REPO:
 			return {
 				...state,
 				repo: action.repo
 			};
-		case STAR_HISTORY_LOADING:
+
+		case GET_REPO_INFO_SUCCESS:
 			return {
 				...state,
-				loadingProgress: action.loadingProgress
+				totalStarsCount: action.payload.data['stargazers_count']
 			};
 
 		default:
@@ -51,37 +66,11 @@ export default (state = initialState, action) => {
 
 export const getStarHistory = () => {
 	return (dispatch, getState) => {
-		dispatch({
-			type: STAR_HISTORY_REQUESTED
-		});
+		const repo = getState().repoStars.repo;
 
-		const repository = getState().repoStars.repo;
-		let totalStarsCount, loadedStarsCount = 0;
-
-		// TODO: handle as separate action, see interceptor
-		function onChunkLoaded(size) {
-			loadedStarsCount = loadedStarsCount + size;
-			dispatch({
-				type: STAR_HISTORY_LOADING,
-				loadingProgress: Math.round((loadedStarsCount / totalStarsCount) * 100)
-			});
-		}
-
-		function onHistoryLoaded(data) {
-			dispatch({
-				type: STAR_HISTORY_RECEIVED,
-				data
-			})
-		}
-
-		return dispatch(fetchRepoInfo({repository}))
-			.then(response => {totalStarsCount = response.payload.data['stargazers_count']})
-			.then(() => dispatch(fetchStarHistory({repository, onChunkLoaded})))
-			.then(onHistoryLoaded)
+		return dispatch(fetchRepoInfo({repo}))
+			.then(() => dispatch(fetchStarHistory({repo})))
 			.catch((e) => {
-				dispatch({
-					type: STAR_HISTORY_ERROR
-				});
 				console.log(e);
 				alert('Something went wrong!') // TODO: remove this
 			});
@@ -91,34 +80,34 @@ export const getStarHistory = () => {
 export const changeRepo = ({repo}) => {
 	return dispatch => {
 		dispatch({
-			type: REPO_CHANGED,
+			type: CHANGE_REPO,
 			repo
 		});
 	}
 };
 
-const fetchRepoInfo = ({repository}) => {
+const fetchRepoInfo = ({repo}) => {
 	return dispatch => dispatch({
-		type: 'GET_REPO_INFO',
+		type: GET_REPO_INFO,
 		payload: {
 			request: {
-				url: `/repos/${repository}`
+				url: `/repos/${repo}`
 			}
 		}
 	});
 };
 
-const fetchStarHistory = ({repository}) => {
+const fetchStarHistory = ({repo}) => {
 	return dispatch => dispatch({
-		type: 'GET_STAR_HISTORY',
+		type: GET_STAR_HISTORY,
 		payload: {
 			request: {
-				url: `/repos/${repository}/stargazers`,
+				url: `/repos/${repo}/stargazers`,
 				headers: { 'Accept': 'application/vnd.github.v3.star+json' },
 				params: { per_page: 100 }
 			}
 		}
-	}).then((res) => aggregateByMonth(res.payload.data));
+	});
 };
 
 function aggregateByMonth(history) {

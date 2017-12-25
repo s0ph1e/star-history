@@ -35,8 +35,8 @@ const githubClientOptions = {
 						aggregatedData = (aggregatedData || []).concat(data);
 
 						dispatch({
-							type: `${action}_CHUNK`,
-							size: data.length
+							type: `${action.type}_CHUNK`,
+							length: data.length
 						});
 
 						const hasLinks = res.headers && res.headers.link;
