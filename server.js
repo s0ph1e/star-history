@@ -42,8 +42,8 @@ app.get('/auth/github/callback',
 );
 
 app.get('/logout', (req, res) => {
-    res.clearCookie(cookieName);
-    res.redirect('/');
+	res.clearCookie(cookieName);
+	res.redirect('/');
 });
 
 app.get('/',
@@ -87,7 +87,7 @@ function getAccessToken(cookie) {
 
 	try {
 		const githubData = JSON.parse(cookie);
-        return githubData ? githubData.accessToken : null;
+		return githubData ? githubData.accessToken : null;
 	} catch (e) {
 		return null;
 	}
