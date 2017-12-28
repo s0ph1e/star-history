@@ -6,7 +6,6 @@ import store, { history } from './store'
 import App from './components/App'
 
 import 'bootstrap/dist/css/bootstrap.css';
-// import './index.css'
 
 const target = document.getElementById('root');
 

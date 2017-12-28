@@ -27,8 +27,9 @@ app.set('port', process.env.PORT || 3001);
 app.use(cookieParser());
 app.use(passport.initialize());
 
-app.get('/auth/github', passport.authenticate('github', {}));
+app.get('/static', app.use(express.static('build')));
 
+app.get('/auth/github', passport.authenticate('github', {}));
 app.get('/auth/github/callback',
 	passport.authenticate('github', {}),
 	(req, res) => {
@@ -46,12 +47,10 @@ app.get('/logout', (req, res) => {
 	res.redirect('/');
 });
 
-app.get('/',
+app.get('*',
 	checkAccessToken,
 	(req, res) => res.sendFile(path.join(__dirname + '/build/index.html'))
 );
-
-app.use(express.static('build'));
 
 http.createServer(app).listen(app.get('port'), function(){
 	console.log('Express server listening on port ' + app.get('port'));
