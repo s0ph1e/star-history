@@ -9,6 +9,8 @@ export const CHANGE_REPO = 'stars/CHANGE_REPO';
 export const GET_REPO_INFO = 'stars/GET_REPO_INFO';
 export const GET_REPO_INFO_SUCCESS = 'stars/GET_REPO_INFO_SUCCESS';
 
+export const CLEAR_DATA = 'stars/CLEAR_DATA';
+
 const initialState = {
 	repo: '',
 	data: [],
@@ -59,6 +61,11 @@ export default (state = initialState, action) => {
 				totalStarsCount: action.payload.data['stargazers_count']
 			};
 
+		case CLEAR_DATA:
+			return {
+				...initialState
+			};
+
 		default:
 			return state
 	}
@@ -82,6 +89,14 @@ export const changeRepo = ({repo}) => {
 		dispatch({
 			type: CHANGE_REPO,
 			repo
+		});
+	}
+};
+
+export const clear = () => {
+	return dispatch => {
+		dispatch({
+			type: CLEAR_DATA
 		});
 	}
 };

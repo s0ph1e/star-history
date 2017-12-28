@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import { bindActionCreators } from 'redux';
 import {connect} from 'react-redux';
 import {getUserRepos} from '../../modules/userRepos';
+import { Link } from 'react-router-dom'
 import 'devicon';
 import './style.css';
 
@@ -16,12 +17,14 @@ class RepoList extends Component {
 			<div className="d-flex justify-content-center">
 				<div className="repo-list">
 					{this.props.items.map((item) => (
-						<div key={item.id} className="d-flex flex-row repo-list__item pt-1 pb-1 pr-sm-3 pl-sm-3">
+						<Link to={`/?repo=${item.name}`}
+							  key={item.id}
+							  className="d-flex flex-row repo-list__item pt-1 pb-1 pr-3 pl-3">
 							<div className="p-1 mr-auto repo_list__item-name">
 								{this.renderRepoDescription(item)}
 							</div>
 							<div className="p-1 align-self-center repo-list__item-stars">{item.starsCount}&#x02605;</div>
-						</div>
+						</Link>
 					))}
 				</div>
 			</div>
@@ -34,7 +37,7 @@ class RepoList extends Component {
 		return (
 			<div className="d-flex flex-column">
 				<div>
-					<a className="repo-list__item-name-link" href={url}>{name}</a>
+					<span className="repo-list__item-name-link">{name}</span>
 					<span className="repo-list__item-language">{languageIcon}</span>
 				</div>
 				<p className="text-muted small mb-0">{description}</p>

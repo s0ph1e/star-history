@@ -35,6 +35,14 @@ class Searchbar extends Component {
 		this.props.onSearch(this.props.repo);
 	}
 
+	componentDidMount() {
+		if (this.props.repo) {
+			this.doSearch();
+		} else {
+			this.props.onClear();
+		}
+	}
+
 	render() {
 		return (
 			<div className="searchbar">

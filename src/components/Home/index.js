@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import { getStarHistory } from '../../modules/repoStars';
+import { getStarHistory, clear } from '../../modules/repoStars';
 
 import Searchbar from '../Searchbar';
 import StarHistoryGraph from '../StarHistoryGraph';
@@ -15,7 +15,7 @@ class Home extends Component {
 		const message = `Star history is loading: ${progress}%`;
 		return (
 			<div>
-				<Searchbar onSearch={this.props.getStarHistory} />
+				<Searchbar onSearch={this.props.getStarHistory} onClear={this.props.clearStarHistory} />
 				<StarHistoryGraph data={this.props.starHistoryData} />
 				{this.props.starHistoryIsLoading && <Loading message={message}/>}
 			</div>
@@ -31,7 +31,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({
-	getStarHistory
+	getStarHistory,
+	clearStarHistory: clear
 }, dispatch);
 
 export default connect(

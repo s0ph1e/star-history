@@ -45,7 +45,6 @@ const githubClientOptions = {
 						}
 						res.data = aggregatedData;
 					}
-					console.log('RESULT', res);
 					return res;
 				}
 			}

@@ -1,12 +1,10 @@
 import { createStore, applyMiddleware, compose } from 'redux'
 import { routerMiddleware } from 'react-router-redux'
 import thunk from 'redux-thunk'
-import createHistory from 'history/createBrowserHistory'
 import githubAxiosMiddleware from './utils/githubAxiosMiddleware';
 import querySyncEnhancer from './utils/querySyncEnhancer';
+import history from './utils/history';
 import rootReducer from './modules'
-
-export const history = createHistory();
 
 const initialState = {};
 const enhancers = [
@@ -30,3 +28,4 @@ const store = createStore(
 );
 
 export default store
+export { history }

@@ -3,6 +3,7 @@
 }
 
 .repo-list__item:hover {
+    text-decoration: none;
     background-color: #efefef;
 }
 
