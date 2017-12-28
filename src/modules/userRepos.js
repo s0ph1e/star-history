@@ -9,7 +9,6 @@ const initialState = {
 export default (state = initialState, action) => {
 	switch (action.type) {
 		case GET_USER_REPOS_SUCCESS:
-		    console.log(action.payload.data);
 			return {
 				...state,
 				items: getRepoItems(action.payload.data)

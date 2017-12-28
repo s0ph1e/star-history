@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import {Input, Button, InputGroup} from 'reactstrap'
-
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { changeRepo } from '../../modules/repoStars';
@@ -38,7 +37,11 @@ class Searchbar extends Component {
 	componentDidMount() {
 		if (this.props.repo) {
 			this.doSearch();
-		} else {
+		}
+	}
+
+	componentDidUpdate() {
+		if (!this.props.repo) {
 			this.props.onClear();
 		}
 	}
