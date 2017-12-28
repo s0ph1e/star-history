@@ -77,10 +77,7 @@ export const getStarHistory = () => {
 
 		return dispatch(fetchRepoInfo({repo}))
 			.then(() => dispatch(fetchStarHistory({repo})))
-			.catch((e) => {
-				console.log(e);
-				alert('Something went wrong!') // TODO: remove this
-			});
+			.catch((e) => console.log(e));
 	}
 };
 

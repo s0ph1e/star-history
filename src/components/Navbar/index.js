@@ -29,7 +29,7 @@ class AppNavbar extends React.Component {
 			<div className="App-header">
 				<div className="App-header__container">
 					<Navbar color="faded" light expand="sm">
-						<NavbarBrand href="/" className="brand">Github Star History</NavbarBrand>
+						<NavbarBrand href="/" className="brand">&#x02605; Github Star History</NavbarBrand>
 						<NavbarToggler onClick={this.toggle} />
 						<Collapse isOpen={this.state.isOpen} navbar>
 							{this.renderNav()}

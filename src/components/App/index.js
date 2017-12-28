@@ -4,6 +4,7 @@ import Navbar from '../Navbar';
 import { Route } from 'react-router-dom'
 import Home from '../Home';
 import RepoList from '../RepoList';
+import Errors from '../Errors';
 
 class App extends Component {
 	render() {
@@ -12,6 +13,7 @@ class App extends Component {
 				<Navbar/>
 				<div className="App-container">
 					<div className="container">
+						<Errors />
 						<Route exact path="/" component={Home} />
 						<Route exact path="/repos" component={RepoList} />
 					</div>

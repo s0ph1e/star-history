@@ -1,5 +1,7 @@
 import axios from 'axios';
 import axiosMiddleware from 'redux-axios-middleware';
+import { addError } from '../modules/errors';
+import { GET_REPO_INFO, GET_STAR_HISTORY } from '../modules/repoStars';
 
 const githubClient = axios.create({
 	baseURL: 'https://api.github.com',
@@ -18,8 +20,8 @@ const githubClientOptions = {
 				return req;
 			}
 		],
-		response: [
-			({getState, dispatch, getSourceAction}, req) => {
+		response: [{
+			success: ({getState, dispatch, getSourceAction}, req) => {
 				const action = req.config.reduxSourceAction;
 				let aggregatedData;
 				return handleResponse(req);
@@ -47,8 +49,36 @@ const githubClientOptions = {
 					}
 					return res;
 				}
+			},
+			error: ({getState, dispatch, getSourceAction}, error) => {
+				let message = '';
+
+				const errorPrefix = {
+					[GET_REPO_INFO]: 'Can not get repo',
+					[GET_STAR_HISTORY]: 'Can not get star history'
+				}[error.config.reduxSourceAction.type] || 'Error in request';
+
+				message += `${errorPrefix} '${error.config.reduxSourceAction.payload.request.url}'. `;
+
+				const isAuthorized = getState().user.accessToken;
+				const limitExceed = error.response.headers['x-ratelimit-remaining'] === '0';
+
+				if (error.response.status === 403) {
+					if (!isAuthorized && limitExceed) {
+						message += 'Limit of requests exceed. Sign in with github and try again';
+					} else if (limitExceed) {
+						message += 'Limit of requests exceed';
+					}
+				} else {
+					message += `${error.response.status} ${error.response.statusText}`;
+				}
+
+				const appError = {message};
+				dispatch(addError({error: appError}));
+
+				return Promise.reject(error);
 			}
-		]
+		}]
 	}
 };
 

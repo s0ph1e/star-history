@@ -9,13 +9,6 @@
     margin: 0 auto;
 }
 
-.App-header__container .navbar-brand.brand {
-    background: url('./star-static.svg') no-repeat;
-    background-position-y: center;
-    padding-left: 40px;
-    color: #555;
-}
-
 .App-header__container .btn-github {
     background-image: url('./github-logo.png');
     background-position: 10px center;
