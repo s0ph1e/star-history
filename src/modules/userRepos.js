@@ -1,6 +1,5 @@
 export const GET_USER_REPOS = 'userRepos/GET_USER_REPOS';
 export const GET_USER_REPOS_SUCCESS = 'userRepos/GET_USER_REPOS_SUCCESS';
-export const GET_USER_REPOS_ERROR = 'userRepos/GET_USER_REPOS_ERROR';
 
 const initialState = {
 	items: []

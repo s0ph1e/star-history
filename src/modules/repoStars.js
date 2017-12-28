@@ -2,7 +2,7 @@ import moment from 'moment';
 
 export const GET_STAR_HISTORY = 'stars/GET_STAR_HISTORY';
 export const GET_STAR_HISTORY_SUCCESS = 'stars/GET_STAR_HISTORY_SUCCESS';
-export const GET_STAR_HISTORY_ERROR = 'stars/GET_STAR_HISTORY_ERROR';
+export const GET_STAR_HISTORY_FAIL = 'stars/GET_STAR_HISTORY_FAIL';
 export const GET_STAR_HISTORY_CHUNK = 'stars/GET_STAR_HISTORY_CHUNK';
 
 export const CHANGE_REPO = 'stars/CHANGE_REPO';
@@ -41,7 +41,7 @@ export default (state = initialState, action) => {
 				isLoading: false
 			};
 
-		case GET_STAR_HISTORY_ERROR:
+		case GET_STAR_HISTORY_FAIL:
 			return {
 				...state,
 				data: [],
@@ -76,8 +76,7 @@ export const getStarHistory = () => {
 		const repo = getState().repoStars.repo;
 
 		return dispatch(fetchRepoInfo({repo}))
-			.then(() => dispatch(fetchStarHistory({repo})))
-			.catch((e) => console.log(e));
+			.then(() => dispatch(fetchStarHistory({repo})));
 	}
 };
 
