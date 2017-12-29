@@ -1,5 +1,5 @@
 {
-  "name": "github-stars-graph",
+  "name": "star-history",
   "version": "0.1.0",
   "private": true,
   "proxy": {
@@ -45,5 +45,10 @@
   },
   "devDependencies": {
     "eslint": "^4.12.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/s0ph1e/star-history.git"
+  },
+  "author": "Sophia Antipenko <sophia@antipenko.pp.ua>"
 }

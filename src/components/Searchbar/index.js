@@ -55,7 +55,7 @@ class Searchbar extends Component {
 						onChange={this.handleRepoChange}
 						onKeyDown={this.handleKeyDown}
 					/>
-					<Button color="primary" onClick={this.doSearch}>Go!</Button>
+					<Button color="info" onClick={this.doSearch}>Go!</Button>
 				</InputGroup>
 			</div>
 		)
