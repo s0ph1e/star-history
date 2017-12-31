@@ -21,14 +21,17 @@ Display star history for github repositories
 
 ```sh
 # Example 
+npm i
 GITHUB_APP_ID="XXXX" GITHUB_APP_SECRET="XXXX" npm start
 ```
 
 #### Production
-* `npm rub build` - build client app
+* `npm run build` - build client app
 * run `server.js` file with your favourite process management tool
 
 ```sh
 # Example
+npm i
+npm run build
 PORT="XXXX" GITHUB_APP_ID="XXXX" GITHUB_APP_SECRET="XXXX" pm2 start server.js
 ```
