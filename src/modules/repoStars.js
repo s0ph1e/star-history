@@ -128,7 +128,7 @@ function aggregateByMonth(history) {
 	const amountOfMonth = lastDate.diff(firstDate, 'months');
 
 	const amountsMap = {};
-	for (let i = 0; i <= amountOfMonth; i++) {
+	for (let i = -1; i <= amountOfMonth; i++) {
 		const currentMonth = firstDate.clone().add(i, 'months').format('YYYY-MM');
 		amountsMap[currentMonth] = 0;
 	}

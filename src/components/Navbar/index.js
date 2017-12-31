@@ -54,6 +54,9 @@ class AppNavbar extends React.Component {
 						<NavLink tag={Link} to="/repos">Your repos</NavLink>
 					</NavItem>
 				)}
+				<NavItem>
+					<NavLink href="https://github.com/s0ph1e/star-history">Github</NavLink>
+				</NavItem>
 			</Nav>
 		)
 	}

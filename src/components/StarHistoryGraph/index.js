@@ -18,14 +18,14 @@ class StarHistoryGraph extends Component {
 					<Tooltip />
 					<Legend verticalAlign="bottom" height={36}/>
 					<Line type='monotone' dataKey='amount'
-						  name="total amount of stars"
-						  stroke='#80bdff'
-						  strokeWidth={2}
-						  dot={false}
-						  legendType='star'
+						name="all stars"
+						stroke='#80bdff'
+						strokeWidth={2}
+						dot={false}
+						legendType='star'
 					/>
 					<Line type='monotone' dataKey='increment'
-						name="amount of new stars"
+						name="new stars"
 						stroke='#adaaef'
 						strokeWidth={1}
 						dot={false}
