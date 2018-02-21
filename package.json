@@ -43,7 +43,7 @@
     "start:server": "node server.js",
     "start:client": "react-scripts start",
     "build": "react-scripts build",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"No test specified\"",
     "eject": "react-scripts eject"
   },
   "devDependencies": {
