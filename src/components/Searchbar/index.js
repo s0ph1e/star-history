@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
 import {Input, Button, InputGroup} from 'reactstrap'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
-import { changeRepo } from '../../modules/repoStars';
 
 const repoPlaceholder = 'octocat/hello-worId';
 const ESCAPE_KEY = 27;
@@ -40,12 +37,6 @@ class Searchbar extends Component {
 		}
 	}
 
-	componentDidUpdate() {
-		if (!this.props.repo) {
-			this.props.onClear();
-		}
-	}
-
 	render() {
 		return (
 			<div className="searchbar">
@@ -62,15 +53,4 @@ class Searchbar extends Component {
 	}
 }
 
-const mapStateToProps = state => ({
-	repo: state.repoStars.repo
-});
-
-const mapDispatchToProps = dispatch => bindActionCreators({
-	changeRepo
-}, dispatch);
-
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps
-)(Searchbar)
+export default Searchbar;
