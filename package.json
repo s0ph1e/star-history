@@ -43,7 +43,7 @@
     "start:server": "node server.js",
     "start:client": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "eject": "react-scripts eject"
   },
   "devDependencies": {
@@ -53,5 +53,9 @@
     "type": "git",
     "url": "git://github.com/s0ph1e/star-history.git"
   },
-  "author": "Sophia Antipenko <sophia@antipenko.pp.ua>"
+  "author": "Sophia Antipenko <sophia@antipenko.pp.ua>",
+  "engines": {
+    "node" : ">=8",
+    "npm": ">=5"
+  }
 }
