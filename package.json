@@ -55,7 +55,7 @@
   },
   "author": "Sophia Antipenko <sophia@antipenko.pp.ua>",
   "engines": {
-    "node" : ">=8",
+    "node": ">=8",
     "npm": ">=5"
   }
 }
