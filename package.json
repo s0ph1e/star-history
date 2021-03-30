@@ -1,18 +1,7 @@
 {
   "name": "star-history",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "proxy": {
-    "/auth/github": {
-      "target": "http://localhost:3001/"
-    },
-    "/auth/github/callback": {
-      "target": "http://localhost:3001/"
-    },
-    "/logout": {
-      "target": "http://localhost:3001/"
-    }
-  },
   "dependencies": {
     "@octokit/rest": "^18.5.2",
     "axios": "^0.21.1",
@@ -22,6 +11,7 @@
     "devicon": "^2.10.1",
     "express": "^4.17.1",
     "history": "^4.10.1",
+    "http-proxy-middleware": "^1.1.0",
     "moment": "^2.29.1",
     "passport": "^0.4.1",
     "passport-github2": "^0.1.12",
@@ -30,7 +20,7 @@
     "react-redux": "^5.1.2",
     "react-router-dom": "^4.2.2",
     "react-router-redux": "^5.0.0-alpha.9",
-    "react-scripts": "1.0.17",
+    "react-scripts": "^4.0.3",
     "reactstrap": "^5.0.0-alpha.4",
     "recharts": "^1.8.5",
     "redux": "^3.7.2",
@@ -47,7 +37,7 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
-    "eslint": "^4.12.1"
+    "eslint": "^7.23.0"
   },
   "repository": {
     "type": "git",
@@ -55,7 +45,19 @@
   },
   "author": "Sophia Antipenko <sophia@antipenko.pp.ua>",
   "engines": {
-    "node": ">=8",
-    "npm": ">=5"
+    "node": ">=12",
+    "npm": ">=6"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
