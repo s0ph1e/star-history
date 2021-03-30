@@ -4,7 +4,7 @@ const http = require('http');
 const path = require('path');
 const passport = require('passport');
 const GitHubStrategy = require('passport-github2').Strategy;
-const GithubApi = require('github');
+const GithubApi = require('@octokit/rest');
 
 const cookieName = 'gh_data';
 const oneYear = 1000 * 60 * 60 * 24 * 365;
