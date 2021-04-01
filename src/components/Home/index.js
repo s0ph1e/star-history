@@ -27,6 +27,7 @@ class Home extends Component {
 		const message = `Star history is loading: ${progress}%`;
 		return (
 			<div>
+				<h1>View star history for repository</h1>
 				<Searchbar repo={this.props.starHistoryRepo}
 					changeRepo={this.props.changeRepo}
 					onSearch={this.props.getStarHistory}

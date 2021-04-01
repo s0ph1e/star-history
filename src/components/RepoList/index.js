@@ -16,6 +16,7 @@ class RepoList extends Component {
 		return (
 			<div className="d-flex justify-content-center">
 				<div className="repo-list">
+					<h1 className="pr-3 pl-3">Select from your repositories</h1>
 					{this.props.items.map((item) => (
 						<Link to={`/?repo=${item.name}`}
 							  key={item.id}
