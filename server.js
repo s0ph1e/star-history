@@ -4,18 +4,18 @@ const http = require('http');
 const path = require('path');
 const passport = require('passport');
 const GitHubStrategy = require('passport-github2').Strategy;
-const GithubApi = require('@octokit/rest');
+const { createOAuthUserAuth } = require("@octokit/auth-oauth-user");
 
 const cookieName = 'gh_data';
 const oneYear = 1000 * 60 * 60 * 24 * 365;
 
-const clientID = process.env.GITHUB_APP_ID;
+const clientId = process.env.GITHUB_APP_ID;
 const clientSecret = process.env.GITHUB_APP_SECRET;
 
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
 
-passport.use(new GitHubStrategy({clientID, clientSecret},
+passport.use(new GitHubStrategy({clientID: clientId, clientSecret},
 	(accessToken, refreshToken, profile, done) => {
 		process.nextTick(() => done(null, {accessToken, profile}));
 	}
@@ -56,23 +56,24 @@ http.createServer(app).listen(app.get('port'), function(){
 	console.log('Express server listening on port ' + app.get('port'));
 });
 
-function checkAccessToken (req, res, next) {
+async function checkAccessToken (req, res, next) {
 	const accessToken = getAccessToken(req.cookies[cookieName]);
 
 	if (accessToken) {
-		const github = new GithubApi({});
-		github.authenticate({
-			type: 'basic',
-			username: clientID,
-			password: clientSecret
-		});
-		github.authorization.check({
-			client_id: clientID,
-			access_token: accessToken
-		}).then(() => next()).catch(() => {
+		try {
+			const auth = createOAuthUserAuth({
+				clientId,
+				clientSecret,
+				clientType: 'oauth-app',
+				token: accessToken,
+			});
+			await auth({type: 'check'});
+			next();
+		} catch (err) {
+			console.warn('Github auth failed', err);
 			res.clearCookie(cookieName);
 			next();
-		});
+		}
 	} else {
 		res.clearCookie(cookieName);
 		next();
