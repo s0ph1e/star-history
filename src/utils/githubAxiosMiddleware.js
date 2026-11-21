@@ -34,7 +34,8 @@ const githubClientOptions = {
 
 						dispatch({
 							type: `${action.type}_CHUNK`,
-							length: data.length
+							// star history pages hold weekly totals, not individual stars
+							length: data.reduce((sum, item) => sum + (typeof item.total === 'number' ? item.total : 1), 0)
 						});
 
 						const hasLinks = res.headers && res.headers.link;

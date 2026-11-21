@@ -113,34 +113,49 @@ const fetchStarHistory = ({repo}) => {
 		type: GET_STAR_HISTORY,
 		payload: {
 			request: {
-				url: `/repos/${repo}/stargazers`,
-				headers: { 'Accept': 'application/vnd.github.v3.star+json' },
-				params: { per_page: 100 }
+				// GitHub restricted /stargazers to repo admins/collaborators (July 2026).
+				// The privacy-safe replacement returns weekly star counts, newest first.
+				url: `/repos/${repo}/stargazers/history`,
+				headers: {
+					'Accept': 'application/vnd.github+json',
+					'X-GitHub-Api-Version': '2026-03-10'
+				},
+				params: { per_page: 30 }
 			}
 		}
 	});
 };
 
+// history: [{week: <unix seconds>, total: <stars that week>, days: [Sun..Sat counts]}]
 function aggregateByMonth(history) {
-	const dates = history.map((event) => moment(event.starred_at));
-	const firstDate = moment.min(dates).startOf('month');
-	const lastDate = moment.max(dates).startOf('month');
-	const amountOfMonth = lastDate.diff(firstDate, 'months');
-
 	const amountsMap = {};
-	for (let i = -1; i <= amountOfMonth; i++) {
-		const currentMonth = firstDate.clone().add(i, 'months').format('YYYY-MM');
-		amountsMap[currentMonth] = 0;
+	history.forEach(({week, total, days}) => {
+		const weekStart = moment.unix(week);
+		const dailyCounts = Array.isArray(days) && days.length ? days : [total];
+		dailyCounts.forEach((count, i) => {
+			const month = weekStart.clone().add(i, 'days').format('YYYY-MM');
+			amountsMap[month] = (amountsMap[month] || 0) + count;
+		});
+	});
+
+	// Skip the leading empty period before the first star
+	const months = Object.keys(amountsMap).sort();
+	const firstIndex = months.findIndex((month) => amountsMap[month] > 0);
+	if (firstIndex === -1) {
+		return [];
 	}
 
-	dates.forEach((date) => {
-		const dateMonth = date.format('YYYY-MM');
-		amountsMap[dateMonth]++;
-	});
+	const firstDate = moment(months[firstIndex], 'YYYY-MM');
+	const lastDate = moment(months[months.length - 1], 'YYYY-MM');
+	const amountOfMonth = lastDate.diff(firstDate, 'months');
 
 	let tmpAmount = 0;
-	return Object.keys(amountsMap).map((month) => {
-		tmpAmount += amountsMap[month];
-		return {month, increment: amountsMap[month], amount: tmpAmount}
-	});
+	const result = [];
+	for (let i = -1; i <= amountOfMonth; i++) {
+		const month = firstDate.clone().add(i, 'months').format('YYYY-MM');
+		const increment = amountsMap[month] || 0;
+		tmpAmount += increment;
+		result.push({month, increment, amount: tmpAmount});
+	}
+	return result;
 }
