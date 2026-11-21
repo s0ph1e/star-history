@@ -1,14 +1,11 @@
-FROM node:14-alpine
+FROM node:26-alpine
 
-#ENV NODE_ENV=production
 WORKDIR /app
 
-#COPY ["package.json", "package-lock.json*", "./"]
+COPY package.json package-lock.json ./
+RUN npm ci
+
 COPY . .
-RUN npm install
-
-#COPY . .
-
 RUN npm run build
 
 CMD [ "node", "server.js" ]

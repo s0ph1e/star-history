@@ -1,55 +1,70 @@
-const express = require('express');
-const cookieParser = require('cookie-parser');
-const http = require('http');
-const path = require('path');
-const passport = require('passport');
-const GitHubStrategy = require('passport-github2').Strategy;
-const { createOAuthUserAuth } = require("@octokit/auth-oauth-user");
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import http from 'node:http';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { getWebFlowAuthorizationUrl, exchangeWebFlowCode, checkToken } from '@octokit/oauth-methods';
+
+const buildDir = path.join(import.meta.dirname, 'build');
 
 const cookieName = 'gh_data';
+const stateCookieName = 'gh_oauth_state';
 const oneYear = 1000 * 60 * 60 * 24 * 365;
+const tenMinutes = 1000 * 60 * 10;
 
 const clientId = process.env.GITHUB_APP_ID;
 const clientSecret = process.env.GITHUB_APP_SECRET;
-
-passport.serializeUser((user, done) => done(null, user));
-passport.deserializeUser((obj, done) => done(null, obj));
-
-passport.use(new GitHubStrategy({clientID: clientId, clientSecret},
-	(accessToken, refreshToken, profile, done) => {
-		process.nextTick(() => done(null, {accessToken, profile}));
-	}
-));
+const clientType = 'oauth-app';
 
 const app = express();
 
 app.set('port', process.env.PORT || 3001);
 app.use(cookieParser());
-app.use(passport.initialize());
 
-app.get('/static', app.use(express.static('build')));
+// index.html is served by the catch-all route below, after the token check
+app.use(express.static(buildDir, { index: false }));
 
-app.get('/auth/github', passport.authenticate('github', {}));
-app.get('/auth/github/callback',
-	passport.authenticate('github', {}),
-	(req, res) => {
+// OAuth web flow: https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#web-application-flow
+// The callback URL is the one configured in the OAuth App settings.
+app.get('/auth/github', (req, res) => {
+	const state = crypto.randomBytes(16).toString('hex');
+	res.cookie(stateCookieName, state, stateCookieOptions(req));
+	const { url } = getWebFlowAuthorizationUrl({ clientType, clientId, state });
+	res.redirect(url);
+});
+
+app.get('/auth/github/callback', async (req, res) => {
+	const { code, state } = req.query;
+	const expectedState = req.cookies[stateCookieName];
+	res.clearCookie(stateCookieName, stateCookieOptions(req));
+
+	if (!code || !state || !expectedState || !safeEqual(state, expectedState)) {
+		console.warn('Github auth callback rejected: missing code or state mismatch');
+		return res.redirect('/');
+	}
+
+	try {
+		const { authentication } = await exchangeWebFlowCode({ clientType, clientId, clientSecret, code });
+		const { data } = await checkToken({ clientType, clientId, clientSecret, token: authentication.token });
 		const githubData = {
-			accessToken: req.user.accessToken,
-			username: req.user.profile._json.login
+			accessToken: authentication.token,
+			username: data.user.login
 		};
 		res.cookie(cookieName, JSON.stringify(githubData), { expires: new Date(Date.now() + oneYear) });
-		res.redirect('/');
+	} catch (err) {
+		console.warn('Github auth callback failed', err);
 	}
-);
+	res.redirect('/');
+});
 
 app.get('/logout', (req, res) => {
 	res.clearCookie(cookieName);
 	res.redirect('/');
 });
 
-app.get('*',
+app.get('/{*splat}',
 	checkAccessToken,
-	(req, res) => res.sendFile(path.join(__dirname + '/build/index.html'))
+	(req, res) => res.sendFile(path.join(buildDir, 'index.html'))
 );
 
 http.createServer(app).listen(app.get('port'), function(){
@@ -61,13 +76,7 @@ async function checkAccessToken (req, res, next) {
 
 	if (accessToken) {
 		try {
-			const auth = createOAuthUserAuth({
-				clientId,
-				clientSecret,
-				clientType: 'oauth-app',
-				token: accessToken,
-			});
-			await auth({type: 'check'});
+			await checkToken({ clientType, clientId, clientSecret, token: accessToken });
 			next();
 		} catch (err) {
 			console.warn('Github auth failed', err);
@@ -88,7 +97,17 @@ function getAccessToken(cookie) {
 	try {
 		const githubData = JSON.parse(cookie);
 		return githubData ? githubData.accessToken : null;
-	} catch (e) {
+	} catch {
 		return null;
 	}
+}
+
+function stateCookieOptions(req) {
+	return { httpOnly: true, sameSite: 'lax', secure: req.secure, maxAge: tenMinutes, path: '/auth/github' };
+}
+
+function safeEqual(a, b) {
+	const bufA = Buffer.from(String(a));
+	const bufB = Buffer.from(String(b));
+	return bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB);
 }

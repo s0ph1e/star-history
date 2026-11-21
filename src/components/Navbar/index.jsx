@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 
 import {
 	Collapse, Navbar, NavbarBrand, NavbarToggler, Nav, NavItem, NavLink,
@@ -43,7 +43,7 @@ class AppNavbar extends React.Component {
 
 	renderNav() {
 		return (
-			<Nav className="mr-auto" navbar>
+			<Nav className="me-auto" navbar>
 				{this.props.username && (
 					<NavItem>
 						<NavLink tag={Link} to="/">Home</NavLink>

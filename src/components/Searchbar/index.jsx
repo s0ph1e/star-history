@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import {Input, Button, InputGroup} from 'reactstrap'
 
 const repoPlaceholder = 'octocat/hello-worId';
@@ -41,7 +41,7 @@ class Searchbar extends Component {
 		return (
 			<div className="searchbar">
 				<InputGroup>
-					<Input className="mr-2" placeholder={repoPlaceholder}
+					<Input className="me-2" placeholder={repoPlaceholder}
 						value={this.props.repo}
 						onChange={this.handleRepoChange}
 						onKeyDown={this.handleKeyDown}
