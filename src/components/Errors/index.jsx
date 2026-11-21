@@ -1,7 +1,7 @@
 import React from 'react';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { Alert } from 'reactstrap';
+import { Alert } from 'react-bootstrap';
 import { removeError } from '../../modules/errors';
 
 class Errors extends React.Component {
@@ -17,7 +17,7 @@ class Errors extends React.Component {
 		return (
 			<div className="errors">
 				{this.props.errors.map((e, i) =>
-					<Alert color="danger" key={i} toggle={() => this.removeError(i)}>
+					<Alert variant="danger" key={i} dismissible onClose={() => this.removeError(i)}>
 						{e.message}
 					</Alert>
 				)}

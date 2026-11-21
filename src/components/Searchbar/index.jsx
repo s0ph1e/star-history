@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import {Input, Button, InputGroup} from 'reactstrap'
+import { Form, Button, InputGroup } from 'react-bootstrap';
 
 const repoPlaceholder = 'octocat/hello-worId';
 const ESCAPE_KEY = 27;
@@ -41,12 +41,12 @@ class Searchbar extends Component {
 		return (
 			<div className="searchbar">
 				<InputGroup>
-					<Input className="me-2" placeholder={repoPlaceholder}
+					<Form.Control className="me-2" placeholder={repoPlaceholder}
 						value={this.props.repo}
 						onChange={this.handleRepoChange}
 						onKeyDown={this.handleKeyDown}
 					/>
-					<Button color="info" onClick={this.doSearch}>Go!</Button>
+					<Button variant="info" onClick={this.doSearch}>Go!</Button>
 				</InputGroup>
 			</div>
 		)

@@ -1,90 +1,54 @@
-import React from 'react';
-import { connect } from 'react-redux'
-import { Link } from 'react-router'
-
-import {
-	Collapse, Navbar, NavbarBrand, NavbarToggler, Nav, NavItem, NavLink,
-	Button, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem
-} from 'reactstrap';
+import { connect } from 'react-redux';
+import { Link } from 'react-router';
+import { Container, Navbar, Nav, Button, Dropdown } from 'react-bootstrap';
 
 import './style.css';
 
-class AppNavbar extends React.Component {
-	constructor(props) {
-		super(props);
-
-		this.toggle = this.toggle.bind(this);
-		this.state = {
-			isOpen: false
-		};
-	}
-	toggle() {
-		this.setState({
-			isOpen: !this.state.isOpen
-		});
-	}
-
-	render() {
-		return (
-			<div className="App-header">
-				<div className="App-header__container">
-					<Navbar color="faded" light expand="sm">
-						<NavbarBrand tag={Link} to="/" className="brand">&#x02605; Github Star History</NavbarBrand>
-						<NavbarToggler onClick={this.toggle} />
-						<Collapse isOpen={this.state.isOpen} navbar>
-							{this.renderNav()}
-							{this.renderProfileMenu()}
-						</Collapse>
-					</Navbar>
-				</div>
+function AppNavbar({ username }) {
+	return (
+		<div className="App-header">
+			<div className="App-header__container">
+				<Navbar expand="sm">
+					<Container fluid>
+						<Navbar.Brand as={Link} to="/" className="brand">&#x02605; Github Star History</Navbar.Brand>
+						<Navbar.Toggle aria-controls="app-navbar-nav" />
+						<Navbar.Collapse id="app-navbar-nav">
+							<Nav className="me-auto">
+								{username && <Nav.Link as={Link} to="/">Home</Nav.Link>}
+								{username && <Nav.Link as={Link} to="/repos">Your repos</Nav.Link>}
+								<Nav.Link href="https://github.com/s0ph1e/star-history">Github</Nav.Link>
+							</Nav>
+							<ProfileMenu username={username} />
+						</Navbar.Collapse>
+					</Container>
+				</Navbar>
 			</div>
+		</div>
+	);
+}
+
+function ProfileMenu({ username }) {
+	if (!username) {
+		return (
+			<Button size="sm" variant="secondary" href="/auth/github" className="btn-github mt-2 mb-2 mt-sm-0 mb-sm-0">
+				Sign in with Github
+			</Button>
 		);
 	}
-
-	renderNav() {
-		return (
-			<Nav className="me-auto" navbar>
-				{this.props.username && (
-					<NavItem>
-						<NavLink tag={Link} to="/">Home</NavLink>
-					</NavItem>
-				)}
-				{this.props.username && (
-					<NavItem>
-						<NavLink tag={Link} to="/repos">Your repos</NavLink>
-					</NavItem>
-				)}
-				<NavItem>
-					<NavLink href="https://github.com/s0ph1e/star-history">Github</NavLink>
-				</NavItem>
-			</Nav>
-		)
-	}
-
-	renderProfileMenu() {
-		if (!this.props.username) {
-			return <Button size="sm" href="/auth/github" className="btn-github mt-2 mb-2 mt-sm-0 mb-sm-0">Sign in with Github</Button>;
-		}
-		return (
-			<UncontrolledDropdown className="mt-2 mb-2 mt-sm-0 mb-sm-0">
-				<DropdownToggle caret color="outline-secondary" size="sm">
-					Hi {this.props.username}
-				</DropdownToggle>
-				<DropdownMenu>
-					<DropdownItem href="/logout">
-						logout
-					</DropdownItem>
-				</DropdownMenu>
-			</UncontrolledDropdown>
-		)
-	}
+	return (
+		<Dropdown align="end" className="mt-2 mb-2 mt-sm-0 mb-sm-0">
+			<Dropdown.Toggle variant="outline-secondary" size="sm">
+				Hi {username}
+			</Dropdown.Toggle>
+			<Dropdown.Menu>
+				<Dropdown.Item href="/logout">logout</Dropdown.Item>
+			</Dropdown.Menu>
+		</Dropdown>
+	);
 }
 
 const mapStateToProps = state => ({
 	username: state.user.username
 });
 
-export default connect(
-	mapStateToProps,
-	null
-)(AppNavbar)
+export default connect(mapStateToProps)(AppNavbar);
