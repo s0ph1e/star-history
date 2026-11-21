@@ -1,8 +1,8 @@
-import React, {Component} from 'react';
+import { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import {connect} from 'react-redux';
 import {getUserRepos} from '../../modules/userRepos';
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import 'devicon';
 import './style.css';
 
@@ -16,12 +16,12 @@ class RepoList extends Component {
 		return (
 			<div className="d-flex justify-content-center">
 				<div className="repo-list">
-					<h1 className="pr-3 pl-3">Select from your repositories</h1>
+					<h1 className="pe-3 ps-3">Select from your repositories</h1>
 					{this.props.items.map((item) => (
 						<Link to={`/?repo=${item.name}`}
 							  key={item.id}
-							  className="d-flex flex-row repo-list__item pt-1 pb-1 pr-3 pl-3">
-							<div className="p-1 mr-auto repo_list__item-name">
+							  className="d-flex flex-row repo-list__item pt-1 pb-1 pe-3 ps-3">
+							<div className="p-1 me-auto repo_list__item-name">
 								{this.renderRepoDescription(item)}
 							</div>
 							<div className="p-1 align-self-center repo-list__item-stars">{item.starsCount}&#x02605;</div>
@@ -32,7 +32,7 @@ class RepoList extends Component {
 		);
 	}
 
-	renderRepoDescription({name, description, url, language}) {
+	renderRepoDescription({name, description, language}) {
 		const languageIcon = this.renderLanguageIcon(language);
 
 		return (

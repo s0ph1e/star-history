@@ -1,9 +1,7 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import './style.css';
 import Navbar from '../Navbar';
-import { Route } from 'react-router-dom'
-import Home from '../Home';
-import RepoList from '../RepoList';
+import { Outlet } from 'react-router'
 import Errors from '../Errors';
 
 class App extends Component {
@@ -14,8 +12,7 @@ class App extends Component {
 				<div className="App-container">
 					<div className="container">
 						<Errors />
-						<Route exact path="/" component={Home} />
-						<Route exact path="/repos" component={RepoList} />
+						<Outlet />
 					</div>
 				</div>
 			</div>

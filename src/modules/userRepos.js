@@ -1,3 +1,5 @@
+import { githubRequest } from '../utils/githubRequest';
+
 export const GET_USER_REPOS = 'userRepos/GET_USER_REPOS';
 export const GET_USER_REPOS_SUCCESS = 'userRepos/GET_USER_REPOS_SUCCESS';
 
@@ -19,14 +21,13 @@ export default (state = initialState, action) => {
 }
 
 export const getUserRepos = () => {
-	return dispatch => dispatch({
+	return dispatch => dispatch(githubRequest({
 		type: GET_USER_REPOS,
-		payload: {
-			request: {
-				url: '/user/repos'
-			}
+		request: {
+			url: '/user/repos'
 		}
-	});
+	// failures are already shown through the errors module
+	})).catch(() => {});
 };
 
 function getRepoItems (data) {

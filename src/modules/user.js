@@ -20,7 +20,7 @@ function getCookie(name) {
 		const value = parts.pop().split(';').shift();
 		try {
 			return JSON.parse(decodeURIComponent(value));
-		} catch(e) {
+		} catch {
 			return null;
 		}
 	}

@@ -4,8 +4,8 @@ Display star history for github repositories
 
 ### Requirements
 
-* nodejs version >= 12
-* npm version >= 6
+* nodejs version >= 26 (see `.nvmrc`)
+* npm version >= 11
 * Github OAuth App - can be set up in [settings](https://github.com/settings/developers) (needed to authenticate github users)
   * For "Authorization callback URL" field use `http://localhost:3000/auth/github/callback` (for development)
 

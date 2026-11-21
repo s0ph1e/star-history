@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import {ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line, Legend} from 'recharts';
 import './style.css'
 
